@@ -28,7 +28,7 @@ sdkClient = SdkClient(url, accessToken, accessSecret)
 '''
 根据代码配置生成合同草稿
 该场景模拟一个人事合同的场景，即平台方公司与员工签署合同，平台方公司先签署，员工后签
-并且指定了平台方公司的内部签署流程：（1）审批（2）公章签署（3）法人章签署
+并且指定了平台方公司的内部签署流程：（1）公章签署（2）法人章签署
 '''
 draft_contract = Contract()
 draft_contract.set_subject("合同主题-人事合同")
@@ -41,24 +41,16 @@ company_receiver = User()
 company_receiver.set_contact("17621699044")
 company_receiver.set_contactType("MOBILE")
 company_signatory.set_receiver(company_receiver)
-# 设置平台方公司签署流程 - 审批流程，并设置审批人
-audit_action = Action()
-audit_action.set_type("AUDIT")
-audit_action.set_serialNo(1)
-audit_operator = User()
-audit_operator.set_contact("17621699044")
-audit_operator.set_contactType("MOBILE")
-audit_action.set_operators([audit_operator])
 # 设置平台方公司签署流程 - 公章签署流程，并设置该流程应该签署的公章
 seal_action = Action()
 seal_action.set_type("COMPANY")
-seal_action.set_serialNo(2)
+seal_action.set_serialNo(1)
 seal_action.set_sealId("2490828768980361630")
 # 设置平台方公司签署流程 - 法人章签署流程
 lp_action = Action()
 lp_action.set_type("LP")
-lp_action.set_serialNo(3)
-company_signatory.set_actions([audit_action, seal_action, lp_action])
+lp_action.set_serialNo(2)
+company_signatory.set_actions([seal_action, lp_action])
 # 设置签署方 - 个人签署方，并设置附件上传要求
 personal_signatory = Signatory()
 personal_signatory.set_tenantType("PERSONAL")
@@ -68,12 +60,6 @@ personal_receiver = User()
 personal_receiver.set_contact("15021504325")
 personal_receiver.set_contactType("MOBILE")
 personal_signatory.set_receiver(personal_receiver)
-# 生成上传附件要求
-personal_attachment = Attachment()
-personal_attachment.set_title("附件-身份证正面照")
-personal_attachment.set_required(True)
-personal_signatory.set_attachments([personal_attachment])
-draft_contract.set_signatories([company_signatory, personal_signatory])
 # 设置合同过期时间
 draft_contract.set_expireTime("2020-07-28 23:59:59")
 # 不发起合同
@@ -193,16 +179,6 @@ send_mapper = json.loads(send_response)
 if send_mapper['code'] != 0:
     raise Exception('发起合同失败，失败原因：', send_mapper['message'])
 print('合同发起成功')
-
-'''
-合同审批
-'''
-audit_response = sdkClient.request(ContractAuditRequest(draft_contractid, True, '符合要求，审核通过'))
-# 解析返回数据
-audit_mapper = json.loads(audit_response)
-if audit_mapper['code'] != 0:
-    raise Exception('审批合同失败，失败原因：', audit_mapper['message'])
-print('合同审批成功')
 
 '''
 公章签署，若发起合同时未指定签署位置需要在此处指定签署位置
