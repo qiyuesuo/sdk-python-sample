@@ -46,11 +46,7 @@ seal_action = Action()
 seal_action.set_type("COMPANY")
 seal_action.set_serialNo(1)
 seal_action.set_sealId("2490828768980361630")
-# 设置平台方公司签署流程 - 法人章签署流程
-lp_action = Action()
-lp_action.set_type("LP")
-lp_action.set_serialNo(2)
-company_signatory.set_actions([seal_action, lp_action])
+company_signatory.set_actions([seal_action])
 # 设置签署方 - 个人签署方，并设置附件上传要求
 personal_signatory = Signatory()
 personal_signatory.set_tenantType("PERSONAL")
@@ -122,7 +118,6 @@ print('根据模板添加合同文档成功，文档ID：', template_documentId)
 platform_signatoryId = None
 personal_signatoryId = None
 company_actionId = None
-lp_actionId = None
 
 for signatory in draft_result['signatories']:
     if signatory['tenantName'] == '大头橙橙汁公司' and signatory['tenantType'] == 'COMPANY':
@@ -130,8 +125,6 @@ for signatory in draft_result['signatories']:
         for action in signatory['actions']:
             if action['type'] == 'COMPANY':
                 company_actionId = action['id']
-            if action['type'] == 'LP':
-                lp_actionId = action['id']
     if signatory['tenantType'] == 'PERSONAL':
         personal_signatoryId = signatory['id']
 
@@ -144,14 +137,6 @@ seal_stamper.set_offsetX(0.3)
 seal_stamper.set_offsetY(0.5)
 seal_stamper.set_page(1)
 
-# 设置签署位置 - 法人章签署
-lp_stamper = Stamper()
-lp_stamper.set_actionId(lp_actionId)
-lp_stamper.set_documentId(file_documentId)
-lp_stamper.set_type('LP')
-lp_stamper.set_offsetX(0.6)
-lp_stamper.set_offsetY(0.4)
-lp_stamper.set_page(1)
 
 # 设置签署位置 - 时间戳签署
 time_stamper = Stamper()
@@ -173,7 +158,7 @@ personal_stamper.set_page(1)
 
 # 请求服务器
 send_response = sdkClient.request(
-    ContractSendRequest(draft_contractid, [seal_stamper, lp_stamper, time_stamper, personal_stamper]))
+    ContractSendRequest(draft_contractid, [seal_stamper, time_stamper, personal_stamper]))
 # 解析返回数据
 send_mapper = json.loads(send_response)
 if send_mapper['code'] != 0:
@@ -218,38 +203,6 @@ sealsign_mapper = json.loads(sealsign_response)
 if sealsign_mapper['code'] != 0:
     raise Exception('公章签署失败，失败原因：', sealsign_mapper['message'])
 print('公章签署成功')
-
-'''
-法人章签署，若发起合同时未指定签署位置需要在此处指定签署位置
-'''
-lp_signParam = SignParam()
-lp_signParam.set_contractId(draft_contractid)
-
-'''
-# 指定签署位置 - 法人章
-seal_lpStamper = Stamper()
-seal_lpStamper.set_documentId(file_documentId)
-seal_lpStamper.set_type('LP')
-seal_lpStamper.set_offsetX(0.6)
-seal_lpStamper.set_offsetY(0.1)
-seal_lpStamper.set_page(1)
-
-# 指定签署位置 - 时间戳
-time_lpStamper = Stamper()
-time_lpStamper.set_documentId(file_documentId)
-time_lpStamper.set_type('TIMESTAMP')
-time_lpStamper.set_offsetY(0.9)
-time_lpStamper.set_offsetX(0.8)
-time_lpStamper.set_page(1)
-
-lp_signParam.set_stampers([seal_lpStamper, time_lpStamper])
-'''
-lp_response = sdkClient.request(ContractSignLpRequest(lp_signParam))
-# 解析返回数据
-lp_mapper = json.loads(lp_response)
-if lp_mapper['code'] != 0:
-    raise Exception('法人章签署失败，失败原因：', lp_mapper['message'])
-print('法人章签署完成')
 
 '''
 平台方签署完成，签署方签署可采用

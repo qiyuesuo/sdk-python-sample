@@ -76,16 +76,6 @@ if seal_mapper['code'] != 0:
 print('公章签署成功')
 
 '''
-法人章签署，此处默认为业务分类已经配置了签署位置且公司维护了有效的法人章，否则需要在此处指定签署位置
-'''
-response = sdkClient.request(ContractSignLpRequest(SignParam(contractid)))
-# 解析返回参数
-lp_mapper = json.loads(response)
-if lp_mapper['code'] != 0:
-    raise Exception('法人章签署失败，失败原因：', lp_mapper['message'])
-print('法人章签署成功')
-
-'''
 平台方签署完成，签署方签署可采用
 （1）接收短信的方式登录契约锁云平台进行签署
 （2）生成内嵌页面签署链接进行签署（下方生成的链接）
