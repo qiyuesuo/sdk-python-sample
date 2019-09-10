@@ -56,6 +56,7 @@ personal_receiver = User()
 personal_receiver.set_contact("15021504325")
 personal_receiver.set_contactType("MOBILE")
 personal_signatory.set_receiver(personal_receiver)
+draft_contract.set_signatories([company_signatory, personal_signatory])
 # 设置合同过期时间
 draft_contract.set_expireTime("2020-07-28 23:59:59")
 # 不发起合同
