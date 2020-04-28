@@ -12,9 +12,9 @@ from bean.SignParam import *
 import json
 
 '''
-初始化契约锁客户端，将accessToken与accessSecret替换为自己的数据值
+初始化客户端，将accessToken与accessSecret替换为自己的数据值
 '''
-url = "https://openapi.qiyuesuo.cn"
+url = "替换为开放平台请求地址"
 accessToken = '替换为您开放平台的 App Token'
 accessSecret = '替换为您开放平台的 App Secret'
 sdkClient = SdkClient(url, accessToken, accessSecret)
@@ -77,7 +77,7 @@ print('公章签署成功')
 
 '''
 平台方签署完成，签署方签署可采用
-（1）接收短信的方式登录契约锁云平台进行签署
+（1）接收短信的方式登录公有云云平台进行签署
 （2）生成内嵌页面签署链接进行签署（下方生成的链接）
 （3）JS-SDK签署（仅支持个人）
 '''
